@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
+from tqdm import tqdm
 
 from bs4 import BeautifulSoup
 
@@ -86,7 +87,7 @@ def get_all_products() -> [Product]:
     options = Options()
     options.add_argument("--headless")
     with webdriver.Chrome(options=options) as driver:
-        for name, url in URLS.items():
+        for name, url in tqdm(URLS.items()):
             print(f"Parsing {name} page")
             driver.get(urljoin(BASE_URL, url))
             load_products(driver)
