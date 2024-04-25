@@ -38,7 +38,7 @@ URLS = {
 def parse_single_product(soup: BeautifulSoup) -> Product:
     return Product(
         title=soup.select_one(".title")["title"],
-        description=soup.select_one(".description").text,
+        description=soup.select_one(".description").text.replace(" ", " "),
         price=float(soup.select_one(".price").text.replace("$", "")),
         rating=len(soup.select(".ws-icon")),
         num_of_reviews=int(soup.select_one(".review-count").text.split()[0]),
