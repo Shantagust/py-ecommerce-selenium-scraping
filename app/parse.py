@@ -34,13 +34,6 @@ URLS = {
 }
 
 
-def init_driver() -> webdriver.Chrome:
-    options = Options()
-    options.add_argument("--headless")
-    driver = webdriver.Chrome(options=options)
-    return driver
-
-
 def parse_single_product(soup: BeautifulSoup) -> Product:
     return Product(
         title=soup.select_one(".title")["title"],
@@ -68,7 +61,7 @@ def confirm_cookies(driver: webdriver.Chrome) -> None:
         try:
             accept = WebDriverWait(driver, 5).until(
                 expected_conditions.element_to_be_clickable(
-                    (By.CLASS_NAME,  "acceptCookies")
+                    (By.CLASS_NAME, "acceptCookies")
                 )
             )
             accept.click()
@@ -90,16 +83,20 @@ def load_products(driver: webdriver.Chrome) -> None:
 
 
 def get_all_products() -> [Product]:
-    driver = init_driver()
-    for name, url in URLS.items():
-        print(f"Parsing {name} page")
-        driver.get(urljoin(BASE_URL, url))
-        load_products(driver)
-        confirm_cookies(driver)
-        soup = BeautifulSoup(driver.page_source, "html.parser")
-        all_products = get_single_page_products(soup)
-        write_products_to_csv(products=all_products, filename=f"{name}.csv")
-    driver.quit()
+    options = Options()
+    options.add_argument("--headless")
+    with webdriver.Chrome(options=options) as driver:
+        for name, url in URLS.items():
+            print(f"Parsing {name} page")
+            driver.get(urljoin(BASE_URL, url))
+            load_products(driver)
+            confirm_cookies(driver)
+            soup = BeautifulSoup(driver.page_source, "html.parser")
+            all_products = get_single_page_products(soup)
+            write_products_to_csv(
+                products=all_products,
+                filename=f"{name}.csv"
+            )
 
 
 if __name__ == "__main__":
